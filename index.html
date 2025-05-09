@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Calculadora</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Intro.js CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/intro.js/minified/introjs.min.css">
+</head>
+<body>
+
+<!-- Botón para iniciar el tour -->
+<button onclick="startIntro()" style="position: fixed; top: 10px; right: 10px; z-index: 999;">¿Cómo funciona?</button>
+
+<h1 class="main-title" data-intro="Esta es una calculadora para crear tablas de verdad. Si estas en una computadora, se puede navegar con las flechas ← y → ">Calculadora de Tablas de Verdad:</h1>
+
+<div id="logic-buttons" data-intro="Usá estos botones para escribir proposiciones lógicas con conectores y letras.">
+  <!-- Operadores -->
+  <button onclick="addSymbol('¬')">¬</button>
+  <button onclick="addSymbol('∧')">∧</button>
+  <button onclick="addSymbol('∨')">∨</button>
+  <button onclick="addSymbol('→')">→</button>
+  <button onclick="addSymbol('↔')">↔</button>
+  <button onclick="addSymbol('⊕')">⊕</button>
+  
+  <!-- Letras -->
+  <button onclick="addSymbol('p')">p</button>
+  <button onclick="addSymbol('q')">q</button>
+  <button onclick="addSymbol('r')">r</button>
+  <button onclick="addSymbol('s')">s</button>
+  
+  <!-- Paréntesis -->
+  <button onclick="addSymbol('(')">(</button>
+  <button onclick="addSymbol(')')">)</button>
+</div>
+
+<div id="expressions" data-intro="Aquí se mostrarán las proposiciones que agregues."></div>
+
+<button class="action-button" onclick="addExpressionColumn()" data-intro="Agregá una nueva proposición lógica, cabe aclarar que si la proposición es p→¬q (por ejemplo), no es necesario escribir p y q en proposiciones separadas como si se escribiera una tabla de verdad a mano.">Agregar Proposición</button>
+<button class="action-button" onclick="calculateTruthTable()" data-intro="Calculá la tabla de verdad para las proposiciones ingresadas.">Calcular Proposición</button>
+<button class="action-button" onclick="clearTruthTable()" data-intro="Este botón borra las tablas creadas, para borrar proposiciones se usa el borrar rojo abajo de las proposiciones.">Borrar Tabla</button>
+
+<div id="truth-table" data-intro="Aquí aparecerá la tabla de verdad con los resultados."></div>
+
+<!-- Botón de flecha -->
+<button id="toggle-panel" data-intro="Este botón despliega un panel lateral con ayuda.">&#x25B6;</button>
+
+<!-- Panel lateral -->
+<div id="side-panel" data-intro="Esta tabla explica qué significa cada símbolo lógico y su equivalente en Python y notación matemática.">
+  <table>
+    <caption>Ayuda para la notación y los símbolos:</caption>
+    <thead>
+      <tr>
+        <th>Notación formal</th>
+        <th>Significado</th>
+        <th>Notación informal</th>
+        <th>KaTeX</th>
+        <th>Python</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>¬</td><td>Negación</td><td>no</td><td>$\lnot$</td><td>not</td></tr>
+      <tr><td>∧</td><td>Conjunción</td><td>y</td><td>$\land$</td><td>and</td></tr>
+      <tr><td>∨</td><td>Disyunción</td><td>o</td><td>$\lor$</td><td>or</td></tr>
+      <tr><td>→</td><td>Implicación</td><td>entonces</td><td>$\rightarrow$</td><td>not p or q</td></tr>
+      <tr><td>↔</td><td>Doble implicación</td><td>si y solo si</td><td>$\leftrightarrow$</td><td>p == q</td></tr>
+      <tr><td>⊕</td><td>Disyunción exclusiva</td><td>xor</td><td>$\oplus$</td><td>!=</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<script src="script.js"></script>
+
+<!-- Intro.js -->
+<script src="https://unpkg.com/intro.js/minified/intro.min.js"></script>
+<script>
+  function disableAllButtons(disabled) {
+    const buttons = document.querySelectorAll('button');
+    buttons.forEach(btn => {
+      if (btn.textContent !== '¿Cómo funciona?') {
+        btn.disabled = disabled;
+      }
+    });
+  }
+
+  function startIntro() {
+    disableAllButtons(true); // Desactiva botones al comenzar
+    const intro = introJs();
+
+    intro.onexit(() => {
+      disableAllButtons(false); // Reactiva al salir
+    });
+
+    intro.oncomplete(() => {
+      disableAllButtons(false); // Reactiva al terminar
+    });
+
+    intro.start();
+  }
+</script>
+
+</body>
+</html>
