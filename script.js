@@ -215,3 +215,158 @@ function calculateTruthTable() {
     toggleButton.innerHTML = sidePanel.classList.contains('active') ? '&#x25C0;' : '&#x25B6;';
   });
   
+let intro;
+let tutorialCompleted = false;
+let currentSymbolIndex = 0;
+const symbolSteps = ['p', '→', '¬', 'q'];
+
+const steps = [
+  {
+    element: '.action-button[onclick="addExpressionColumn()"]',
+    intro: "Primero, apretar 'Agregar Proposición'.",
+    action: () => {
+      disableAllButtons(true);
+      document.querySelector('.action-button[onclick="addExpressionColumn()"]').disabled = false;
+      document.getElementById('toggle-panel').disabled = false;
+
+      const addBtn = document.querySelector('.action-button[onclick="addExpressionColumn()"]');
+      addBtn.onclick = () => {
+        addExpressionColumn();
+        intro.nextStep();
+      };
+    }
+  },
+  {
+    element: '#logic-buttons',
+    intro: "Ahora el botón 'p'.",
+    allowedSymbol: 'p',
+    action: () => {
+      enableSingleSymbol('p', () => {
+        intro.nextStep();
+      });
+    }
+  },
+  {
+    element: '#logic-buttons',
+    intro: "Ahora el botón '→'.",
+    allowedSymbol: '→',
+    action: () => {
+      enableSingleSymbol('→', () => {
+        intro.nextStep();
+      });
+    }
+  },
+  {
+    element: '#logic-buttons',
+    intro: "Ahora el botón '¬'.",
+    allowedSymbol: '¬',
+    action: () => {
+      enableSingleSymbol('¬', () => {
+        intro.nextStep();
+      });
+    }
+  },
+  {
+    element: '#logic-buttons',
+    intro: "Finalmente el botón 'q'.",
+    allowedSymbol: 'q',
+    action: () => {
+      enableSingleSymbol('q', () => {
+        intro.nextStep();
+      });
+    }
+  },
+  {
+    element: '.action-button[onclick="calculateTruthTable()"]',
+    intro: "Ahora 'Calcular Proposición'.",
+    action: () => {
+      disableAllButtons(true);
+      const calcBtn = document.querySelector('.action-button[onclick="calculateTruthTable()"]');
+      calcBtn.disabled = false;
+      calcBtn.onclick = () => {
+        calculateTruthTable();
+        tutorialCompleted = true;
+        intro.nextStep();
+      };
+    }
+  },
+  {
+    element: '#truth-table',
+    intro: "Esta es la tabla de verdad resultante.",
+    action: () => {
+      disableAllButtons(false);
+    }
+  }
+];
+
+function startExampleTutorial() {
+  resetTutorial();
+
+  tutorialCompleted = false;
+  intro = introJs();
+  intro.setOptions({
+    steps: steps,
+    showStepNumbers: false,
+    showButtons: false,
+    exitOnOverlayClick: false,
+    exitOnEsc: false,
+    disableInteraction: false,
+    doneLabel: 'Finalizar'
+  });
+
+  intro.onbeforechange(function () {
+    const step = this._currentStep;
+    if (steps[step].action) steps[step].action();
+  });
+
+  intro.onexit(() => {
+    if (!tutorialCompleted) {
+      if (confirm("¿Estás seguro de que querés salir del tutorial antes de terminarlo?")) {
+        disableAllButtons(false);
+      } else {
+        intro.start(); // Reinicia si cancela
+      }
+    } else {
+      disableAllButtons(false);
+    }
+  });
+
+  intro.oncomplete(() => {
+    tutorialCompleted = true;
+    disableAllButtons(false);
+  });
+
+  intro.start();
+}
+
+function resetTutorial() {
+  clearTruthTable();
+  document.getElementById('expressions').innerHTML = '';
+  currentSymbolIndex = 0;
+}
+
+function disableAllButtons(disabled) {
+  const buttons = document.querySelectorAll('button');
+  buttons.forEach(btn => {
+    if (btn.textContent !== '¿Cómo funciona?' && btn.textContent !== 'Ejemplo') {
+      btn.disabled = disabled;
+    }
+  });
+}
+
+function enableSingleSymbol(symbol, callback) {
+  disableAllButtons(true);
+  const buttons = document.querySelectorAll('#logic-buttons button');
+
+  buttons.forEach(btn => {
+    if (btn.textContent === symbol) {
+      btn.disabled = false;
+      btn.onclick = () => {
+        addSymbol(symbol);
+        callback(); // Avanza al siguiente paso
+      };
+    } else {
+      btn.disabled = true;
+    }
+  });
+}
